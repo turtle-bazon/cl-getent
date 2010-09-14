@@ -2,75 +2,90 @@
 
 (in-package :ru.bazon.server-tools.lisp-getent)
 
-(defun find-entry (key entries entry-key-fn)
-  (let ((entries (find-entries key entries entry-key-fn)))
+(defun find-entries (entries predicatefn)
+  (remove-if-not
+   #'(lambda (entry)
+       (funcall predicatefn entry))
+   entries))
+
+(defun find-entries-by-key (key entries entry-key-fn)
+  (find-entries
+   entries
+   #'(lambda (entry)
+       (equal key (funcall entry-key-fn entry)))))
+
+(defun find-entry-by-key (key entries entry-key-fn)
+  (let ((entries (find-entries-by-key key entries entry-key-fn)))
     (if (= (length entries) 1)
 	(first entries)
 	(error "Multiple occuencies (~a) for key ~a" entries key))))
 
-(defun find-entries (key entries entry-key-fn)
-  (remove-if-not
-   #'(lambda (entry)
-       (equal key (funcall entry-key-fn entry)))
-   entries))
+(defstruct user
+  (uid nil :type integer)
+  (gid nil :type integer)
+  (name nil :type string)
+  (fullname nil :type string)
+  (homedir nil :type string)
+  (shell nil :type string))
 
-(defun user-uid (user-info)
-  (parse-integer (elt user-info 2)))
+(defstruct group
+  (gid nil :type integer)
+  (name nil :type string)
+  (member-names '() :type list))
 
-(defun user-gid (user-info)
-  (parse-integer (elt user-info 3)))
-
-(defun user-name (user-info)
-  (elt user-info 0))
-
-(defun group-gid (group-info)
-  (parse-integer (elt group-info 2)))
-
-(defun group-name (group-info)
-  (elt group-info 0))
-
-(defun find-user-by-uid (uid user-infos)
-  (find-entry uid user-infos #'user-uid))
-
-(defun find-user-by-name (name user-infos)
-  (find-entry name user-infos #'user-name))
-
-(defun find-users-by-gid (gid user-infos)
-  (find-entries gid user-infos #'user-gid))
-
-(defun find-group-by-gid (gid group-infos)
-  (find-entry gid group-infos #'group-gid))
-
-(defun find-group-by-name (name group-infos)
-  (find-entry name group-infos #'group-name))
-
-(defun group-members-by-group-users (group-info user-infos)
-  (mapcar #'(lambda (name) (find-user-by-name name user-infos))
-	  (split-sequence #\, (elt group-info 3))))
-
-(defun group-members-by-primary-gid (gid user-infos)
-  (find-users-by-gid gid user-infos))
-
-(defun group-members (name user-infos group-infos)
-  (let ((group-info (find-group-by-name name group-infos)))
-    (sort
-     (remove-duplicates 
-      (append (group-members-by-group-users group-info user-infos)
-	      (group-members-by-primary-gid (group-gid group-info)
-					    user-infos))
-      :test #'(lambda (u1 u2) (equal (user-uid u1) (user-uid u2))))
-     #'(lambda (u1 u2) (string-lessp (user-name u1) (user-name u2))))))
-
-(defun getent-user-infos ()
-  (mapcar
-   #'(lambda (user-string)
-       (split-sequence #\: user-string))
-   (remove-empty-lines
+(defun getent-users ()
+  (remove-if
+   #'(lambda (x) (eq x :empty))
+   (mapcar
+    #'(lambda (user-string)
+	(if (not (equal user-string ""))
+	    (let ((user-list (split-sequence #\: user-string)))
+	      (make-user
+	       :uid (parse-integer (elt user-list 2))
+	       :gid (parse-integer (elt user-list 3))
+	       :name (elt user-list 0)
+	       :fullname (elt user-list 4)
+	       :homedir (elt user-list 5)
+	       :shell (elt user-list 6)))
+	    :empty))
     (run/strings "getent" '("passwd")))))
 
-(defun getent-group-infos ()
-  (mapcar
-   #'(lambda (group-string)
-       (split-sequence #\: group-string))
-   (remove-empty-lines
+(defun getent-groups ()
+  (remove-if
+   #'(lambda (x) (eq x :empty))
+   (mapcar
+    #'(lambda (group-string)
+	(if (not (equal group-string ""))
+	    (let ((group-list (split-sequence #\: group-string)))
+	      (make-group
+	       :gid (parse-integer (elt group-list 2))
+	       :name (elt group-list 0)
+	       :member-names (split-sequence #\, (elt group-list 3))))
+	    :empty))
     (run/strings "getent" '("group")))))
+
+(defun find-user-by-uid (uid &optional (users (getent-users)))
+  (find-entry-by-key uid users #'user-uid))
+
+(defun find-user-by-name (name &optional (users (getent-users)))
+  (find-entry-by-key name users #'user-name))
+
+(defun find-group-by-gid (gid &optional (groups (getent-groups)))
+  (find-entry-by-key gid groups #'group-gid))
+
+(defun find-group-by-name (name &optional (groups (getent-groups)))
+  (find-entry-by-key name groups #'group-name))
+
+(defun user-groups (user &optional
+		    (users (getent-users))
+		    (groups (getent-groups)))
+  (find-entries
+   groups
+   #'(lambda (entry)
+       (find (user-name user)
+	     (group-member-names entry) :test #'equal))))
+
+(defun group-users (group &optional
+		    (users (getent-users))
+		    (groups (getent-groups)))
+  )

@@ -12,8 +12,11 @@
    #:user-name
    #:group-gid
    #:group-name
+   #:group-member-names
    #:find-user-by-uid
    #:find-user-by-name
    #:find-group-by-gid
-   #:find-group-by-name))
+   #:find-group-by-name
+   #:user-groups
+   #:group-users))
 
