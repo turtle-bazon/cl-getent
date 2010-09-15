@@ -6,8 +6,7 @@
     :licence "Lessor Lisp General Public License"
     :version "0.0.1.0"
     :description "Library that uses getent to retreive user system information"
-    :depends-on (external-program
-		 external-program-extender
+    :depends-on (external-program-extender
 		 split-sequence)
     :components ((:module "src"
 			  :components

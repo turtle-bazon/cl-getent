@@ -1,0 +1,6 @@
+lisp-getent (0.0.1.0-1) unstable; urgency=low
+
+  * Initial debianization.
+
+ -- Azamat S. Kalimoulline <turtle@bazon.ru>  Wed, 15 Sep 2010 15:58:51 +0400
+

@@ -3,8 +3,7 @@
 (defpackage #:ru.bazon.server-tools.lisp-getent
   (:nicknames #:lisp-getent)
   (:use #:cl
-        #:external-program
-	#:external-program-extender
+        #:external-program-extender
 	#:split-sequence)
   (:export
    #:user-uid
