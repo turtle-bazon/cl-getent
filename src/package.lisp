@@ -8,9 +8,11 @@
   (:export
    #:getent-users
    #:getent-groups
+   #:user-p
    #:user-uid
    #:user-gid
    #:user-name
+   #:group-p
    #:group-gid
    #:group-name
    #:group-member-names
