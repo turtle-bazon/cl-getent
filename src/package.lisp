@@ -6,6 +6,8 @@
         #:external-program-extender
 	#:split-sequence)
   (:export
+   #:getent-users
+   #:getent-groups
    #:user-uid
    #:user-gid
    #:user-name
