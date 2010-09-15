@@ -8,5 +8,5 @@ Standards-Version: 3.8.2.0
 
 Package: lisp-getent
 Architecture: all
-Depends: libc-bin, external-program-extener, split-sequence
+Depends: libc-bin, external-program-extender, split-sequence
 Description: Provides execution to getent to retreive system users ang groups information.
