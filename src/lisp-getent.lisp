@@ -77,15 +77,27 @@
   (find-entry-by-key name groups #'group-name))
 
 (defun user-groups (user &optional
-		    (users (getent-users))
 		    (groups (getent-groups)))
-  (find-entries
-   groups
-   #'(lambda (entry)
-       (find (user-name user)
-	     (group-member-names entry) :test #'equal))))
+  (union
+   (list (find-group-by-gid (user-gid user) groups))
+   (find-entries
+    groups
+    #'(lambda (entry)
+	(find (user-name user)
+	      (group-member-names entry) :test #'equal)))
+   :test #'(lambda (group1 group2)
+	     (eql (group-gid group1) (group-gid group2)))))
 
 (defun group-users (group &optional
-		    (users (getent-users))
-		    (groups (getent-groups)))
-  )
+		    (users (getent-users)))
+  (union
+   (mapcar
+    #'(lambda (username)
+	(find-user-by-name username users))
+    (group-member-names group))
+   (find-entries
+    users
+    #'(lambda (entry) (eql (user-gid entry)
+			   (group-gid group))))
+   :test #'(lambda (user1 user2)
+	     (eql (user-uid user1) (user-uid user2)))))
