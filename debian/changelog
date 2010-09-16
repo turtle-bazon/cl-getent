@@ -1,3 +1,10 @@
+lisp-getent (0.0.1.0-2) unstable; urgency=low
+
+  * Empty string in group description should be empty user list. Non list of
+    one "" (empty) element.
+
+ -- Azamat S. Kalimoulline <turtle@bazon.ru>  Thu, 16 Sep 2010 22:23:24 +0400
+
 lisp-getent (0.0.1.0-1) unstable; urgency=low
 
   * Initial debianization.

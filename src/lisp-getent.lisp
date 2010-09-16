@@ -60,7 +60,10 @@
 	      (make-group
 	       :gid (parse-integer (elt group-list 2))
 	       :name (elt group-list 0)
-	       :member-names (split-sequence #\, (elt group-list 3))))
+	       :member-names (loop for username in (split-sequence
+						    #\, (elt group-list 3)
+						    :remove-empty-subseqs t)
+				collect (string-trim '(#\Space) username))))
 	    :empty))
     (run/strings "getent" '("group")))))
 
