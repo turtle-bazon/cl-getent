@@ -16,9 +16,9 @@
 
 (defun find-entry-by-key (key entries entry-key-fn)
   (let ((entries (find-entries-by-key key entries entry-key-fn)))
-    (if (= (length entries) 1)
-	(first entries)
-	(error "Multiple occuencies (~a) for key ~a" entries key))))
+    (cond ((eq '() entries) nil)
+	  ((= 1 (length entries)) (first entries))
+	  (t (error "Multiple occuencies (~a) for key ~a" entries key)))))
 
 (defstruct user
   (uid nil :type integer)
@@ -94,10 +94,9 @@
 (defun group-users (group &optional
 		    (users (getent-users)))
   (union
-   (mapcar
-    #'(lambda (username)
-	(find-user-by-name username users))
-    (group-member-names group))
+   (loop for username in (group-member-names group)
+      for user = (find-user-by-name username users)
+      when (not (null user)) collect user)
    (find-entries
     users
     #'(lambda (entry) (eql (user-gid entry)
