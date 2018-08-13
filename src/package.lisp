@@ -1,7 +1,7 @@
 ;;;; -*- mode: lisp -*-
 
-(defpackage #:ru.bazon.server-tools.lisp-getent
-  (:nicknames #:lisp-getent)
+(defpackage #:ru.bazon.server-libs.getent
+  (:nicknames #:getent)
   (:use #:cl
         #:external-program-extender
 	#:split-sequence)

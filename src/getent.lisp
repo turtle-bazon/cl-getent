@@ -1,6 +1,6 @@
 ;;;; -*- mode: lisp -*-
 
-(in-package :ru.bazon.server-tools.lisp-getent)
+(in-package :ru.bazon.server-libs.getent)
 
 (defun find-entries (entries predicatefn)
   (remove-if-not
