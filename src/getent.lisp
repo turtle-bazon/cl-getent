@@ -31,9 +31,9 @@
 (defstruct group
   (gid nil :type integer)
   (name nil :type string)
-  (member-names '() :type list))
+  (members '() :type list))
 
-(defun getent-users ()
+(defun users ()
   (remove-if
    #'(lambda (x) (eq x :empty))
    (mapcar
@@ -50,7 +50,7 @@
 	    :empty))
     (run/strings "getent" '("passwd")))))
 
-(defun getent-groups ()
+(defun groups ()
   (remove-if
    #'(lambda (x) (eq x :empty))
    (mapcar
@@ -60,10 +60,10 @@
 	      (make-group
 	       :gid (parse-integer (elt group-list 2))
 	       :name (elt group-list 0)
-	       :member-names (loop for username in (split-sequence
-						    #\, (elt group-list 3)
-						    :remove-empty-subseqs t)
-				collect (string-trim '(#\Space) username))))
+	       :members (loop for username in (split-sequence
+                                               #\, (elt group-list 3)
+                                               :remove-empty-subseqs t)
+                           collect (string-trim '(#\Space) username))))
 	    :empty))
     (run/strings "getent" '("group")))))
 
@@ -87,14 +87,14 @@
     groups
     #'(lambda (entry)
 	(find (user-name user)
-	      (group-member-names entry) :test #'equal)))
+	      (group-members entry) :test #'equal)))
    :test #'(lambda (group1 group2)
 	     (eql (group-gid group1) (group-gid group2)))))
 
 (defun group-users (group &optional
 		    (users (getent-users)))
   (union
-   (loop for username in (group-member-names group)
+   (loop for username in (group-members group)
       for user = (find-user-by-name username users)
       when (not (null user)) collect user)
    (find-entries
