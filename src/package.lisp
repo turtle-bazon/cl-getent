@@ -5,8 +5,8 @@
   (:use #:cl
         #:cl-bazon)
   (:export
-   #:getent-users
-   #:getent-groups
+   #:users
+   #:groups
    #:user-p
    #:user-uid
    #:user-gid
@@ -14,7 +14,7 @@
    #:group-p
    #:group-gid
    #:group-name
-   #:group-member-names
+   #:group-members
    #:find-user-by-uid
    #:find-user-by-name
    #:find-group-by-gid
