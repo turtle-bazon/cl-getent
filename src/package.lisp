@@ -3,8 +3,7 @@
 (defpackage #:ru.bazon.server-libs.getent
   (:nicknames #:getent)
   (:use #:cl
-        #:external-program-extender
-	#:split-sequence)
+        #:cl-bazon)
   (:export
    #:getent-users
    #:getent-groups
