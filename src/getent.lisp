@@ -1,6 +1,6 @@
 ;;;; -*- mode: lisp -*-
 
-(in-package :ru.bazon.server-libs.getent)
+(in-package :cl-getent)
 
 (defun find-entries (entries predicatefn)
   (remove-if-not
@@ -18,7 +18,7 @@
   (let ((entries (find-entries-by-key key entries entry-key-fn)))
     (cond ((eq '() entries) nil)
 	  ((= 1 (length entries)) (first entries))
-	  (t (error "Multiple occuencies (~a) for key ~a" entries key)))))
+	  (t (error "Multiple occurences (~a) for key ~a" entries key)))))
 
 (defstruct user
   (uid nil :type integer)
@@ -32,6 +32,14 @@
   (gid nil :type integer)
   (name nil :type string)
   (members '() :type list))
+
+(defun run/lines (&rest command-line)
+  (with-input-from-string
+      (si (with-output-to-string (so)
+            (uiop:run-program command-line :output so)))
+    (loop for line = (read-line si nil nil)
+          while line
+          collect line)))
 
 (defun users ()
   (remove-if

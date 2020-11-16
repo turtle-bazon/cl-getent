@@ -1,6 +1,6 @@
 ;;;; -*- mode: lisp -*-
 
-(defpackage #:ru.bazon.server-libs.getent
+(defpackage #:cl-getent
   (:nicknames #:getent)
   (:use #:cl
         #:cl-bazon)
